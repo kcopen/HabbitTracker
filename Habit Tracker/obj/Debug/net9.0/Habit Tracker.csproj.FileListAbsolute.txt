@@ -1,0 +1,14 @@
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\bin\Debug\net9.0\Habit Tracker.exe
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\bin\Debug\net9.0\Habit Tracker.deps.json
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\bin\Debug\net9.0\Habit Tracker.runtimeconfig.json
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\bin\Debug\net9.0\Habit Tracker.dll
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\bin\Debug\net9.0\Habit Tracker.pdb
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\obj\Debug\net9.0\Habit Tracker.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\obj\Debug\net9.0\Habit Tracker.AssemblyInfoInputs.cache
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\obj\Debug\net9.0\Habit Tracker.AssemblyInfo.cs
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\obj\Debug\net9.0\Habit Tracker.csproj.CoreCompileInputs.cache
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\obj\Debug\net9.0\Habit Tracker.dll
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\obj\Debug\net9.0\refint\Habit Tracker.dll
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\obj\Debug\net9.0\Habit Tracker.pdb
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\obj\Debug\net9.0\Habit Tracker.genruntimeconfig.cache
+C:\Users\kncop\OneDrive\Documents\Programming\Habit Tracker\obj\Debug\net9.0\ref\Habit Tracker.dll

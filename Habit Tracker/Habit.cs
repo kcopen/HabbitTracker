@@ -1,69 +1,118 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-class Habit
+using System.Reflection;
+using System.Globalization;
+namespace HabitTrackerApp
 {
-    private string Name { get; }
-    private string Description { get; }
-    private int CurrentDailyStreak { get; } //how many days in a row the habit has been completed
-
-    private List<DateTime> CompletionDateTimes;
-
-    private string FilePath;
-
-
-    public void Habit(string Name, string Description)
+    class Habit
     {
-        this.Name = Name;
-        this.Description = Description;
-        this.CurrentDailyStreak = 0;
-        this.CompletionDateTimes = new List<DateTime>();
-        this.FilePath = $@"c:\habits\{Name}.txt";
-        try
+        public string Name { get; }
+        public string Description { get; }
+        public int CurrentDailyStreak { get; set; } //how many days in a row the habit has been completed
+
+        private List<DateTime> CompletionDateTimes { get; set; }
+
+        private readonly string FilePath;
+
+
+        public Habit(string Name, string Description)
         {
-            File file = File.OpenRead(FilePath);
-            foreach (string line in file.ReadLines(FilePath)) {
-                CompletionDateTimes.add(DateTime.Parse(line));
-            }
+            this.Name = Name;
+            this.Description = Description;
+            CompletionDateTimes = [];
+            CurrentDailyStreak = 0;
+            UpdateStreak(false);
             
-        }
-        catch (IOException e)
-        {
+            //FilePath = @$"c:\habits\{Name}.txt";
+            FilePath = Directory.GetCurrentDirectory() +  "\\..\\..\\..\\habits\\" + Name + ".txt";
+            
 
-        }
-    }
-
-    public void Complete()
-    {
-        try
-        {
-            DateTime CurrentTime = DateTime.Now;
-            File file = File.OpenWrite(FilePath);
-            file.WriteLine(CurrentTime);
-            CompletionDateTimes.Add(CurrentTime);
-
-            DateTime yesterday = Datetime.Today.AddDays(-1);
-            if (CompletionDateTimes.Length == 1)
+            try
             {
-                CurrentDailyStreak++;
+                if (!File.Exists(FilePath))
+                {
+                    File.Create(FilePath);
+                }
+                else
+                {
+                    List<string> Lines = (List<string>)File.ReadLines(FilePath);
+                    foreach (string line in Lines)
+                    {
+                        CompletionDateTimes.Add(DateTime.Parse(line));
+                    }
+                }
             }
-            else if (CompletionDateTimes.Length > 1)
+            catch (Exception e)
             {
-                if (CompletionDateTimes[CompletionDateTimes.Length - 2] == yesterday)
+                Console.WriteLine(e);
+            }
+
+        }
+
+        public void Complete()
+        {
+            try
+            {
+                DateTime CurrentTime = DateTime.Now;
+                using (StreamWriter sw = File.AppendText(FilePath))
+                {
+                    sw.WriteLine(CurrentTime.ToString());
+                }
+
+                CompletionDateTimes.Add(CurrentTime);
+                UpdateStreak(true);
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+        }
+
+        private void UpdateStreak(bool HabitCompletedToday)
+        {
+            DateTime Today = DateTime.Today;
+            DateTime Yesterday = Today.AddDays(-1);
+
+            //add one to habit streak if the habit was completed today
+            if (!HabitCompletedToday)
+            {
+                //if the habit was not completed today or yesterday then reset the streak
+                if
+                (
+                    CompletionDateTimes.Count > 0 &&
+                    (CompletionDateTimes[CompletionDateTimes.Count - 1] != Today || CompletionDateTimes[CompletionDateTimes.Count - 1] != Yesterday)
+                )
+                {
+                    CurrentDailyStreak = 0;
+                }
+                return;
+            }
+            //habit was completed today 
+            if (CompletionDateTimes.Count == 1)
+            {
+                CurrentDailyStreak = 1;
+            }
+            else if (CompletionDateTimes.Count > 1)
+            {
+                //if the habit was completed yesterday then add one to the streak otherwise reset streak to 1
+                if (CompletionDateTimes[CompletionDateTimes.Count - 2] == Yesterday)
                 {
                     CurrentDailyStreak++;
                 }
+                else
+                {
+                    CurrentDailyStreak = 1;
+                }
 
             }
-                    
-            
-        } catch (IOException e) {
-            Console.WriteError(e);
         }
-        
-    }
 
-    public int TotalCompletions() {
-        return CompletionDateTimes.Length;
+        public int TotalCompletions()
+        {
+            return CompletionDateTimes.Count;
+        }
     }
 }
