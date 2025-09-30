@@ -20,12 +20,10 @@ namespace HabitTrackerApp
         {
             this.Name = Name;
             this.Description = Description;
-            CompletionDateTimes = [];
-            CurrentDailyStreak = 0;
+            this.FilePath = Directory.GetCurrentDirectory() +  "\\..\\..\\..\\habits\\" + Name + ".txt";
+            this.CompletionDateTimes = [];
+            this.CurrentDailyStreak = 0;
             UpdateStreak(false);
-            
-            //FilePath = @$"c:\habits\{Name}.txt";
-            FilePath = Directory.GetCurrentDirectory() +  "\\..\\..\\..\\habits\\" + Name + ".txt";
             
 
             try
@@ -34,14 +32,21 @@ namespace HabitTrackerApp
                 {
                     File.Create(FilePath);
                 }
-                else
+
+                using (StreamReader sr = new StreamReader(FilePath))
                 {
-                    List<string> Lines = (List<string>)File.ReadLines(FilePath);
-                    foreach (string line in Lines)
+                    string line;
+                    DateTime date = new();
+
+                    while ((line = sr.ReadLine()) != null)
                     {
-                        CompletionDateTimes.Add(DateTime.Parse(line));
+                        DateTime.TryParse(line, out date);
+                        CompletionDateTimes.Add(date);
                     }
                 }
+            
+                
+
             }
             catch (Exception e)
             {
