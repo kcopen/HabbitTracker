@@ -1,13 +1,15 @@
 using System.Data;
+using System.Formats.Asn1;
 using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
 
 namespace HabitTrackerApp;
 
 class Command
 {
-    public static readonly string[] SingleParamCommands = ["QUIT", "HELP", "SHOW"];
-    public static readonly string[] DoubleParamCommands = ["COMPLETE, REMOVE", "HELP", "SHOW"];
-    public static readonly string[] TripleParamCommands = ["ADD"];
+    public static readonly string[] NoParamCommands = ["QUIT", "HELP", "SHOW"];
+    public static readonly string[] SingleParamCommands = ["COMPLETE, REMOVE", "HELP", "SHOW"];
+    public static readonly string[] DoubleParamCommands = ["ADD"];
     private string Type { get; }
     private string[] Input { get; }
 
@@ -15,29 +17,36 @@ class Command
 
 
 
-    public Command(string[] Input, HabitTracker Tracker)
+    public Command(string[] InputCommand, HabitTracker Tracker)
     {
         this.Tracker = Tracker;
-        this.Input = Input;
-        if (Input.Length > 0) Type = Input[0].ToUpper();
+        this.Input = InputCommand;
+        if (Input.Length == 0) Type = "";
+        else Type = Input[0].ToUpper();
     }
 
-    private static bool IsValid(string[] Command)
+    private bool IsValid()
     {
-        int len = Command[0].Length; //number of params in the command
-        if (
-            (len == 1 && SingleParamCommands.Contains(Command[0])) ||
-            (len == 2 && DoubleParamCommands.Contains(Command[0])) ||
-            (len == 3 && TripleParamCommands.Contains(Command[0]))
+        
+        int len = Input.Length; //number of params in the command
+        if (len == 0) return false;
+        else if (
+            (len == 1 && NoParamCommands.Contains(Type)) ||
+            (len == 2 && SingleParamCommands.Contains(Type)) ||
+            (len == 3 && DoubleParamCommands.Contains(Type))
             ) return true;
-
-        Console.WriteLine("Invalid input format. Type \"HELP\" for valid formats.");
-        return false;
+        else return false;
+        
+        
     }
 
     public bool Execute()
     {
-        if (!IsValid(Input)) return false;
+        if (!IsValid())
+        { 
+            Write(string.Join(' ', Input) + ": is an invalid input format. Type \"HELP\" for valid formats.");
+            return false;
+        }
         switch (Type)
         {
             case "QUIT":
@@ -54,10 +63,7 @@ class Command
                 break;
             case "REMOVE":
                 RemoveHabit(Input[1]);
-                break;
-            default:
-                Help(Type);
-                break;
+                break;               
         }
 
         return true;
@@ -65,58 +71,57 @@ class Command
     }
 
     //helper method to shorten Console.Writeline()
-    private void w(string s) { Console.WriteLine(s); }
+    private static void Write(string s) { Console.WriteLine(s); }
 
-    private void Help(string command)
+    private void Help()
     {
+
+        if (Input.Length < 2)
+        {
+            Write("Commands are format sensitive.");
+            Write("For details about a particular command use the command name for param:");
+            Write("HELP param");
+            Write("Here is the list of valid commands.");
+
+            foreach (string c in Command.NoParamCommands) Write(c);
+            foreach (string c in Command.SingleParamCommands) Write($"{c} param1");
+            foreach (string c in Command.DoubleParamCommands) Write($"{c} param1 param2");
+            return;
+        }
+        string command = Input[1].ToUpper();
         switch (command)
         {
             case "Quit":
-                w($"{command} will quit the application.");
+                Write($"{command} will quit the application.");
                 break;
             case "HELP":
-                w($"{command} will bring up the help menu.");
+                Write($"{command} will bring up the help menu.");
                 break;
             case "ADD":
-                w($"{command} param1 param2 will add a new habit to track.");
-                w("param1 is the name you wish to call the habit");
-                w("param2 is the description of the habit");
+                Write($"{command} param1 param2 will add a new habit to track.");
+                Write("param1 is the name you wish to call the habit");
+                Write("param2 is the description of the habit");
                 break;
             case "REMOVE":
-                w($"{command} param1 will remove the named habit to track.");
-                w("param1 is the name of the habit to remove.");
+                Write($"{command} param1 will remove the named habit to track.");
+                Write("param1 is the name of the habit to remove.");
                 break;
             case "COMPLETE":
-                w($"{command} param1 will add one count to the named habit. Use when you complete a habit.");
-                w("param1 is the name of the habit to complete.");
+                Write($"{command} param1 will add one count to the named habit. Use when you complete a habit.");
+                Write("param1 is the name of the habit to complete.");
                 break;
             case "SHOW":
-                w($"{command} will show your progress on all your tracked habits.");
-                w("SHOW param1 will show your progress on a particular habit.");
-                w("param1 is the name of the habit to show.");
-                break;
-            default:
-                Help();
+                Write($"{command} will show your progress on all your tracked habits.");
+                Write("SHOW param1 will show your progress on a particular habit.");
+                Write("param1 is the name of the habit to show.");
                 break;
         }
-        
-    }
-    private void Help()
-    {
-        w("Commands are format sensitive.");
-        w("For details about a particular command use the command name for param:");
-        w("HELP param");
-        w("Here is the list of valid commands.");
-
-        foreach (string c in Command.SingleParamCommands) w(c);
-        foreach (string c in Command.SingleParamCommands) w($"{c} param1");
-        foreach (string c in Command.SingleParamCommands) w($"{c} param1 param2");
 
     }
 
     private void AddNewHabbit(string HabitName, string HabitDescription)
     {
-        Tracker.TrackedHabits.Add(HabitName, new Habit(HabitName, HabitDescription));
+        Tracker.Habits.Add(HabitName, new Habit(HabitName, HabitDescription));
     }
 
 
@@ -127,12 +132,12 @@ class Command
 
     private void CompleteHabit(string Name)
     {
-        Tracker.TrackedHabits[Name].Complete();
+        Tracker.Habits[Name].Complete();
     }
 
     private void RemoveHabit(string Name)
     {
-        Tracker.TrackedHabits.Remove(Name);
+        Tracker.Habits.Remove(Name);
     }
 
    
