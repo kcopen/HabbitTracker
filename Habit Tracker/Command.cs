@@ -27,7 +27,7 @@ class Command
 
     private bool IsValid()
     {
-        
+
         int len = Input.Length; //number of params in the command
         if (len == 0) return false;
         else if (
@@ -36,14 +36,14 @@ class Command
             (len == 3 && DoubleParamCommands.Contains(Type))
             ) return true;
         else return false;
-        
-        
+
+
     }
 
     public bool Execute()
     {
         if (!IsValid())
-        { 
+        {
             Write(string.Join(' ', Input) + ": is an invalid input format. Type \"HELP\" for valid formats.");
             return false;
         }
@@ -63,7 +63,10 @@ class Command
                 break;
             case "REMOVE":
                 RemoveHabit(Input[1]);
-                break;               
+                break;
+            case "SHOW":
+                Show();
+                break;
         }
 
         return true;
@@ -132,7 +135,12 @@ class Command
 
     private void CompleteHabit(string Name)
     {
-        Tracker.Habits[Name].Complete();
+        Habit habitToComplete = Tracker.Habits[Name];
+        if (habitToComplete == null)
+        {
+            Write($"The habit {Input[1]} was not found.");
+        }
+        else habitToComplete.Complete();
     }
 
     private void RemoveHabit(string Name)
@@ -140,5 +148,33 @@ class Command
         Tracker.Habits.Remove(Name);
     }
 
+    private void Show()
+    {
+        if (Input.Length == 2)
+        {
+            Habit habitToShow = Tracker.Habits[Input[1]];
+            if (habitToShow == null)
+            {
+                Write($"The habit {Input[1]} was not found.");
+                return;
+            }
+
+            foreach (DateTime d in habitToShow.TimeStamps)
+            {
+                Write(d.ToString());
+            }
+        }
+        else
+        {
+            foreach (KeyValuePair<string, Habit> h in Tracker.Habits)
+            {
+                foreach (DateTime d in h.Value.TimeStamps)
+                {
+                    Write(d.ToString());
+                }
+            }
+        }
+        
+    }
    
 }

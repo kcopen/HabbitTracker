@@ -1,9 +1,4 @@
-
-using System.ComponentModel.Design;
-
 namespace HabitTrackerApp;
-
-
 class HabitTracker
 {
     internal bool IsRunning { get; set; }

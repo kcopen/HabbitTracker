@@ -5,28 +5,27 @@ namespace HabitTrackerApp;
 
 class Habit
 {
-    public string Name { get; }
-    public string Description { get; }
-    public int DailyStreak { get; set; } //how many days in a row the habit has been completed
+    internal string Name { get; }
+    internal string Description { get; }
+    internal int DailyStreak { get; set; } //how many days in a row the habit has been completed
 
-    private List<DateTime> Completions { get; set; }
+    internal List<DateTime> TimeStamps { get; set; }
 
     private readonly string FilePath;
-
 
     public Habit(string Name, string Description)
     {
         this.Name = Name;
         this.Description = Description;
         this.FilePath = Directory.GetCurrentDirectory() + "\\..\\..\\..\\habits\\" + Name + ".txt";
-        this.Completions = [];
+        this.TimeStamps = [];
         LoadData();
 
     }
 
     public void Complete()
     {
-        Completions.Add(DateTime.Now);
+        TimeStamps.Add(DateTime.Now);
         UpdateStreak();
         SaveData();
     }
@@ -34,8 +33,8 @@ class Habit
     private void UpdateStreak()
     {
         DailyStreak = 0;
-        if (Completions.Count == 0) return;
-        DateTime MostRecent = Completions[^1];
+        if (TimeStamps.Count == 0) return;
+        DateTime MostRecent = TimeStamps[^1];
 
         //if most recent completion was not today or yesterday then DailyStreak is 0 otherwise increment streak by 1
         TimeSpan interval = MostRecent - DateTime.Today;
@@ -44,9 +43,9 @@ class Habit
 
         //loop through the completions and increment DailyStreak every time there is an interval of 1
         //if the increment is greater than 1 then return
-        for (int i = 2; i <= Completions.Count - 1; i++)
+        for (int i = 2; i <= TimeStamps.Count - 1; i++)
         {
-            interval = Completions[^i] - Completions[^(i + 1)];
+            interval = TimeStamps[^i] - TimeStamps[^(i + 1)];
             if (interval.Days == 1) DailyStreak++;
             else if (interval.Days > 1) return;
         }
@@ -54,7 +53,7 @@ class Habit
 
     public int TotalCompletions()
     {
-        return Completions.Count;
+        return TimeStamps.Count;
     }
 
     public bool SaveData()
@@ -87,7 +86,7 @@ class Habit
             while ((line = sr.ReadLine()) != null)
             {
                 date = DateTime.ParseExact(line, format, CultureInfo.CurrentCulture);
-                Completions.Add(date);
+                TimeStamps.Add(date);
             }
             UpdateStreak();
         }
