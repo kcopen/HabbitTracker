@@ -101,22 +101,26 @@ class Command
                 Write($"{command} will bring up the help menu.");
                 break;
             case "ADD":
-                Write($"{command} param1 param2 will add a new habit to track.");
+                Write($"{command} (param1) (param2) will add a new habit to track.");
                 Write("param1 is the name you wish to call the habit");
                 Write("param2 is the description of the habit");
+                Write("Parameters must be placed in parenthesis.");
                 break;
             case "REMOVE":
-                Write($"{command} param1 will remove the named habit to track.");
+                Write($"{command} (param1) will remove the named habit to track.");
                 Write("param1 is the name of the habit to remove.");
+                Write("Parameters must be placed in parenthesis.");
                 break;
             case "COMPLETE":
-                Write($"{command} param1 will add one count to the named habit. Use when you complete a habit.");
+                Write($"{command} (param1) will add one count to the named habit. Use when you complete a habit.");
                 Write("param1 is the name of the habit to complete.");
+                Write("Parameters must be placed in parenthesis.");
                 break;
             case "SHOW":
                 Write($"{command} will show your progress on all your tracked habits.");
-                Write("SHOW param1 will show your progress on a particular habit.");
+                Write("SHOW (param1) will show your progress on a particular habit.");
                 Write("param1 is the name of the habit to show.");
+                Write("Parameters must be placed in parenthesis.");
                 break;
         }
 
@@ -174,7 +178,32 @@ class Command
                 }
             }
         }
-        
+
+    }
+
+    public static string[] Parse(string Input)
+    {
+        List<string> commandList = [];
+        if (Input.Length < 1) return [];
+
+        int i = Input.IndexOf(' ');
+        commandList[0] = Input[..i].Trim().ToUpper();
+        Input = Input[i..].Trim();
+
+        string NextParam()
+        {
+            string param = "";
+            if (Input.StartsWith('(') && Input.Contains(')'))
+            {
+                i = Input.IndexOf(')');
+                param = Input[1..(i - 1)];
+                Input = Input.Length >= i + 1 ? Input[(i + 1)..].Trim() : "";
+            }
+            return param;
+        }
+
+        while (Input.Length > 0) commandList.Add(NextParam());
+        return [.. commandList];
     }
    
 }

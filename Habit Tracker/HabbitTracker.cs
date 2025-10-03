@@ -19,9 +19,12 @@ class HabitTracker
         string? input = Console.ReadLine();
         if (input != null)
         {
-            Command c = new(input.Split(' '), this);
-            c.Execute();
-            CommandHistory.Add(c);
+            string[] cArray =  Command.Parse(input);
+            if (cArray.Length < 1) return;
+            
+            Command commandToExecute = new(cArray, this);
+            commandToExecute.Execute();
+            CommandHistory.Add(commandToExecute);
         }
         
     }
